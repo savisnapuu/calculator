@@ -16,6 +16,7 @@ let neg = false;
 
 function appendNumber(number){
     if(number === "." && currentOperand.includes(".")) return;
+    if(number === "0" && currentOperand[0] === "0" && !currentOperand.includes(".")) return;
     currentOperand = currentOperand + number
 }
 
@@ -31,12 +32,14 @@ function updateDisplayOperate(){
 }
 
 function equationEquals(){
+    if(previousOperand === "") return
     displayOperator.textContent = ""
     displayMain.textContent = ""
     a = Number(previousOperand);
     b = Number(currentOperand);
     operate(a, b, operator);
     displayOperation.textContent = `${a} ${operator} ${b} = ${sum}`;
+    errorMessage();
     neg = false;
     equationCompleted = true
 }
@@ -72,6 +75,12 @@ function operation(){
     }
 }
 
+function checkNumber(number){
+    if(currentOperand[0] === "0" && !currentOperand.includes(".")){
+        currentOperand = number
+    }
+}
+
 function posNegF(){
     if(currentOperand === "" || equationCompleted === true) return;
     if(neg === false){
@@ -98,12 +107,20 @@ function operate(a, b, operator){
             break;
         case "/":
             if(b === 0){
-                throw "Can't divide by 0!"
+                
             } else {
                 sum =  a / b;
                 break;
             } 
     }return sum;
+}
+
+function errorMessage(){
+    if(b === 0 && operator === "/"){
+        currentOperand = "";
+        displayOperation.textContent = previousOperand;
+        displayMain.textContent = "Cant divide by zero"
+    }
 }
 
 clearOne.addEventListener("click", clearOneNumber)
@@ -115,6 +132,7 @@ buttons.forEach(button => button.addEventListener("click", (e) => {
         clearAll()
     }
     appendNumber(e.target.innerHTML);
+    checkNumber(e.target.innerHTML);
     updateDisplay();
 }))
 
@@ -124,3 +142,4 @@ operatorButtons.forEach(button => button.addEventListener("click", (e) => {
     operator = e.target.textContent;
     displayOperator.textContent = ` ${operator}`
 }))
+
